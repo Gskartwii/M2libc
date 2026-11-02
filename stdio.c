@@ -600,11 +600,17 @@ int vsnprintf(char* s, size_t n, const char* format, va_list arg)
 }
 #undef INLINE_STRSCPY
 
-#define PRINTF_BUFFER_SIZE 4096
-/* Add one to always have a null terminator */
-char printf_buf[PRINTF_BUFFER_SIZE + 1];
+/* 16M */
+#define PRINTF_BUFFER_SIZE (1 << 24)
+
+char *printf_buf = 0;
 int vfprintf(FILE* stream, char* format, va_list arg)
 {
+    if (printf_buf == NULL) {
+        /* Add one to always have a null terminator */
+        printf_buf = malloc(PRINTF_BUFFER_SIZE + 1);
+    }
+
 	int output = 0;
 	va_list ap = arg;
 
